@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 interface DraggableStickyNoteProps {
   id: string;
@@ -35,6 +35,8 @@ export function DraggableStickyNote({
       initial={{ x: initialX, y: initialY, scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.8, opacity: 0 }}
+      whileHover={{ scale: 1.02 }}
+      whileDrag={{ scale: 1.1, rotate: 2, zIndex: 100 }}
       onDragEnd={() => {
         if (noteRef.current && containerRef.current) {
           const noteRect = noteRef.current.getBoundingClientRect();
@@ -59,7 +61,7 @@ export function DraggableStickyNote({
         }}
         className="absolute top-2 right-2 p-1 rounded-full bg-yellow-300 hover:bg-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity text-yellow-800"
       >
-        <XMarkIcon className="w-4 h-4" />
+        <TrashIcon className="w-4 h-4" />
       </button>
 
       {/* Content Area */}
