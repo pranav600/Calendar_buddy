@@ -9,6 +9,7 @@ export type StickyNoteItem = {
   x: number;
   y: number;
   content: string;
+  color?: string;
 };
 
 export type DayWorkspaceData = {
@@ -56,6 +57,7 @@ export function WhiteboardWorkspace({
       x: initialX,
       y: initialY,
       content: '',
+      color: 'bg-yellow-200'
     };
     setData(prev => ({
       ...prev,
@@ -74,6 +76,13 @@ export function WhiteboardWorkspace({
     setData(prev => ({
       ...prev,
       stickies: prev.stickies.map(s => s.id === id ? { ...s, x, y } : s)
+    }));
+  };
+
+  const handleUpdateStickyColor = (id: string, color: string) => {
+    setData(prev => ({
+      ...prev,
+      stickies: prev.stickies.map(s => s.id === id ? { ...s, color } : s)
     }));
   };
 
@@ -98,7 +107,7 @@ export function WhiteboardWorkspace({
            initial={{ opacity: 0 }}
            animate={{ opacity: 1 }}
            exit={{ opacity: 0 }}
-           className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col font-sans"
+           className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col font-mono"
         >
              {/* Header */}
              <motion.div 
@@ -160,9 +169,11 @@ export function WhiteboardWorkspace({
                             initialX={sticky.x}
                             initialY={sticky.y}
                             initialContent={sticky.content}
+                            initialColor={sticky.color || 'bg-yellow-200'}
                             containerRef={containerRef}
                             onUpdateContent={handleUpdateStickyContent}
                             onUpdatePosition={handleUpdateStickyPosition}
+                            onUpdateColor={handleUpdateStickyColor}
                             onDelete={handleDeleteSticky}
                         />
                     ))}

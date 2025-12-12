@@ -17,43 +17,87 @@ import {
   startOfDay,
 } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { ThemeToggle } from "../components/ThemeToggle";
-import { motion, AnimatePresence } from "framer-motion";
+import { Navbar } from "../components/Navbar";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+// import { SpiralBinding } from "../components/SpiralBinding";
 import { WhiteboardWorkspace, DayWorkspaceData } from "../components/WhiteboardWorkspace";
+import { ComingSoonModal } from "../components/ComingSoonModal";
+import { Footer } from "../components/Footer";
+
+const variants: Variants = {
+  enter: (direction: number) => ({
+    rotateX: direction > 0 ? -90 : 90,
+    opacity: 0,
+    scale: 0.8,
+    transformOrigin: "center",
+  }),
+  center: {
+    rotateX: 0,
+    opacity: 1,
+    scale: 1,
+    transformOrigin: "center",
+    transition: {
+      duration: 0.7,
+      type: "spring",
+      bounce: 0.3
+    }
+  },
+  exit: (direction: number) => ({
+    rotateX: direction > 0 ? 90 : -90,
+    opacity: 0,
+    scale: 0.8,
+    transformOrigin: "center",
+    transition: {
+      duration: 0.5,
+      ease: "easeIn"
+    }
+  })
+};
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [showEventModal, setShowEventModal] = useState<boolean>(false);
+  const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true);
   const [events, setEvents] = useState<Record<string, DayWorkspaceData>>({});
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [direction, setDirection] = useState(0);
 
   // Initialize theme based on system or local storage (optional)
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setIsDarkMode(true);
     } else {
-      document.documentElement.classList.remove("dark");
+      setIsDarkMode(false);
     }
-  }, [isDarkMode]);
+  }, []);
 
-  // Generate days for the current month view
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
-  const startDate = startOfWeek(monthStart);
-  const endDate = endOfWeek(monthEnd);
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+    }
+  };
+
+  const daysInMonth = eachDayOfInterval({
+    start: startOfMonth(currentDate),
+    end: endOfMonth(currentDate),
+  });
+
+  const startDay = startOfMonth(currentDate).getDay();
 
   const handlePrevMonth = () => {
-    setCurrentDate(subMonths(currentDate, 1));
+      setDirection(-1);
+      setCurrentDate(subMonths(currentDate, 1));
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(addMonths(currentDate, 1));
-  };
-
-  const handleToday = () => {
-    setCurrentDate(new Date());
+      setDirection(1);
+      setCurrentDate(addMonths(currentDate, 1));
   };
 
   const handleDateClick = (day: Date) => {
@@ -80,109 +124,119 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50/50 dark:bg-background p-4 md:p-8 font-sans text-foreground transition-colors duration-300">
+    <div className="w-full p-2 md:p-4 font-mono text-foreground transition-colors duration-300 flex flex-col items-center relative overflow-hidden">
       
+      {/* Coming Soon Modal */}
+      <ComingSoonModal 
+        isOpen={showWelcomeModal} 
+        onClose={() => setShowWelcomeModal(false)} 
+      />
+
       {/* Top Header */}
-      <div className="max-w-[95%] mx-auto flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Calendar Buddy</h1>
-        
-        <div className="flex items-center gap-4">
-            <button
-              onClick={handleToday}
-              className="px-4 py-1.5 text-sm font-medium border border-border rounded-lg bg-white dark:bg-card hover:bg-gray-50 dark:hover:bg-accent transition-colors shadow-sm"
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+
+      {/* Calendar Container with Spiral Binding */}
+      <div className="relative w-full max-w-4xl perspective-[1200px] z-10 group">
+         {/* Stacked Paper Effect - Layers behind */}
+         <div className="absolute top-2 left-1 w-full h-[600px] bg-white rounded-b-3xl rounded-t-lg shadow-sm transform -rotate-1 opacity-60 pointer-events-none" />
+         <div className="absolute top-4 -left-1 w-full h-[600px] bg-white rounded-b-3xl rounded-t-lg shadow-sm transform rotate-1 opacity-40 pointer-events-none" />
+         
+         {/* <SpiralBinding /> */}
+         
+         <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+                key={currentDate.toString()}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="bg-white dark:bg-stone-50 rounded-b-3xl rounded-t-lg shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden border-t-8 border-stone-100 dark:border-gray-200 min-h-[600px] relative mt-4 origin-top"
             >
-              Today
-            </button>
-            
-            {/* Theme Toggle Switch */}
-            <ThemeToggle isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} />
-        </div>
-      </div>
+                 {/* Paper Texture Overlay */}
+                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
+                 />
 
-      {/* Main Calendar Card */}
-      <div className="max-w-[95%] mx-auto bg-gray-100/80 dark:bg-card/50 backdrop-blur-sm rounded-3xl p-8 border border-white/20 shadow-sm">
-        
-        {/* Calendar Navigation Header */}
-        <div className="flex items-center mb-8">
-            <h2 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mr-auto">
-                {format(currentDate, "MMMM yyyy")}
-            </h2>
-            
-            {/* Can add arrows here if desired, or keep them relative to grid if specific design needs */}
-            {/* Current design shows title left aligned, maybe arrows are subtle or elsewhere. 
-                The prompt image shows "December 2025" large on left. 
-                I will add simple arrows next to it or right aligned if needed. 
-                Let's put them right aligned for clarity. */}
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-y-8 gap-x-4">
-            {/* Weekday Headers */}
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div
-                key={day}
-                className="text-center text-l font-mono text-gray-500 dark:text-gray-400"
-              >
-                {day}
-              </div>
-            ))}
-
-             {/* Days */}
-            {days.map((day, i) => {
-              const isCurrentMonth = isSameMonth(day, currentDate);
-              const isCurrentDay = isToday(day);
-              const dayHasEvent = hasEvent(day);
-              const isSelected = selectedDate && isSameDay(day, selectedDate);
-              const isFutureDate = isAfter(day, startOfDay(new Date()));
-
-              return (
-                <div
-                  key={i}
-                  onClick={() => !isFutureDate && handleDateClick(day)}
-                  className={`
-                    relative group flex flex-col items-center justify-start py-2 h-24 rounded-2xl transition-all
-                    ${
-                        isFutureDate 
-                        ? "cursor-not-allowed opacity-40 bg-gray-50/50 dark:bg-gray-800/30" 
-                        : "cursor-pointer hover:bg-white/60 dark:hover:bg-white/10"
-                    }
-                    ${!isCurrentMonth && !isFutureDate ? "opacity-30" : ""}
-                  `}
-                >
-                  <span
-                    className={`
-                      text-lg font-mono w-8 h-8 flex items-center justify-center rounded-full transition-colors
-                      ${isCurrentDay 
-                        ? "bg-blue-600 text-white shadow-md" 
-                        : isFutureDate 
-                            ? "text-gray-400 dark:text-gray-600"
-                            : "text-gray-700 dark:text-gray-300 group-hover:bg-gray-200/50 dark:group-hover:bg-gray-700/50"
-                      }
-                    `}
-                  >
-                    {format(day, "d")}
-                  </span>
-                  
-                  {/* Event Dot */}
-                  {dayHasEvent && !isFutureDate && (
-                    <div className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-400 dark:bg-blue-400"></div>
-                  )}
+                {/* Calendar Header */}
+                <div className="flex items-center justify-between p-8 pb-4">
+                    <h2 className="text-3xl font-black text-gray-800 dark:text-gray-800 tracking-tight">
+                    {format(currentDate, "MMMM yyyy")}
+                    </h2>
+                    <div className="flex gap-2">
+                    <button
+                        onClick={handlePrevMonth}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-600 dark:text-gray-300"
+                    >
+                        <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
+                    <button
+                        onClick={handleNextMonth}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-600 dark:text-gray-300"
+                    >
+                        <ChevronRightIcon className="w-6 h-6" />
+                    </button>
+                    </div>
                 </div>
-              );
-            })}
-        </div>
+
+                {/* Weekday Headers */}
+                <div className="grid grid-cols-7 gap-2 px-8 mb-2">
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                    <div key={day} className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                        {day}
+                    </div>
+                    ))}
+                </div>
+
+                {/* Days Grid */}
+                <div className="grid grid-cols-7 gap-2 p-8 pt-2">
+                    {Array.from({ length: startDay }).map((_, i) => (
+                    <div key={`empty-${i}`} />
+                    ))}
+                    {daysInMonth.map((day) => {
+                    const isToday = format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
+                    const hasNote = hasEvent(day);
+                    const isFuture = isAfter(day, startOfDay(new Date()));
+                    
+                    return (
+                        <motion.button
+                        key={day.toString()}
+                        disabled={isFuture}
+                        whileHover={!isFuture ? { scale: 1.05, translateY: -2 } : {}}
+                        whileTap={!isFuture ? { scale: 0.95 } : {}}
+                        onClick={() => !isFuture && handleDateClick(day)}
+                        className={`
+                            aspect-square rounded-2xl flex flex-col items-center justify-center relative group transition-all
+                            ${isFuture ? "opacity-30 grayscale cursor-not-allowed bg-gray-50/50" : "cursor-pointer"}
+                            ${isToday 
+                                ? "bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900" 
+                                : !isFuture 
+                                    ? "hover:bg-gray-300 dark:hover:bg-gray-300 text-gray-900 dark:text-gray-900" 
+                                    : "text-gray-400 dark:text-gray-400"
+                            }
+                        `}
+                        >
+                        <span className={`text-lg font-medium ${isToday ? "font-bold" : ""}`}>
+                            {format(day, "d")}
+                        </span>
+                        
+                        {/* Event Dot */}
+                        {hasNote && (
+                            <div className={`
+                            absolute bottom-3 w-1.5 h-1.5 rounded-full
+                            ${isToday ? "bg-white" : "bg-blue-500"}
+                            `} />
+                        )}
+                        </motion.button>
+                    );
+                    })}
+                </div>
+            </motion.div>
+         </AnimatePresence>
       </div>
 
       {/* Footer Year */}
-      <div className="max-w-[95%] mx-auto mt-8 flex justify-between text-gray-900 dark:text-gray-400 font-medium">
-            <div>
-                <h3 className="font-bold">Upcoming Calendar Buddy</h3>
-                <p>{(parseInt(format(currentDate, "yyyy")) + 1).toString()}</p>
-            </div>
-            <div className="text-gray-500 font-normal">
-                © {format(currentDate, "yyyy")} Calendar Buddy
-            </div>
-      </div>
+      <Footer currentDate={currentDate} />
 
 
       {/* Full Screen Whiteboard Workspace */}
@@ -190,8 +244,8 @@ export default function Home() {
         isOpen={showEventModal}
         selectedDate={selectedDate}
         initialData={
-            selectedDate && events[format(selectedDate, "yyyy-MM-dd")] 
-            ? events[format(selectedDate, "yyyy-MM-dd")]
+            selectedDate 
+            ? (events[format(selectedDate, "yyyy-MM-dd")] || { note: "", stickies: [] })
             : { note: "", stickies: [] }
         }
         onClose={() => setShowEventModal(false)}
