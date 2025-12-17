@@ -1,6 +1,8 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
 
+const User = require("./models/User");
+
 passport.use(
 	new GoogleStrategy(
 		{
@@ -8,23 +10,40 @@ passport.use(
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 			callbackURL: "http://localhost:5001/auth/google/callback",
 		},
-		function (accessToken, refreshToken, profile, done) {
-			// Mock user for now since we haven't set up DB models fully
-			// In production, find or create user in DB
-			const user = {
-				id: profile.id,
-				displayName: profile.displayName,
-                photos: profile.photos
-			};
-			done(null, user);
+		async function (accessToken, refreshToken, profile, done) {
+			try {
+                let user = await User.findOne({ googleId: profile.id });
+
+                if (user) {
+                    done(null, user);
+                } else {
+                    const newUser = {
+                        googleId: profile.id,
+                        displayName: profile.displayName,
+                        firstName: profile.name.givenName,
+                        lastName: profile.name.familyName,
+                        image: profile.photos[0].value,
+                    };
+                    user = await User.create(newUser);
+                    done(null, user);
+                }
+            } catch (err) {
+                console.error(err);
+                done(err, null);
+            }
 		}
 	)
 );
 
 passport.serializeUser((user, done) => {
-	done(null, user);
+	done(null, user.id);
 });
 
-passport.deserializeUser((user, done) => {
-	done(null, user);
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
 });
