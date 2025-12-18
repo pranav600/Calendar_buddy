@@ -15,11 +15,11 @@ const ensureAuth = (req, res, next) => {
 // GET all events for the current user
 router.get("/", ensureAuth, async (req, res) => {
   try {
-    const events = await Event.find({ userId: req.user.id });
+    const events = await Event.find({ userId: req.user.id }).lean();
     
     // Decrypt data before sending to frontend
     const decryptedEvents = events.map(event => ({
-        ...event.toObject(),
+        ...event,
         note: decrypt(event.note),
         stickies: event.stickies.map(sticky => ({
             ...sticky,

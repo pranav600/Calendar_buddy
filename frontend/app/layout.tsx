@@ -18,9 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
+        suppressHydrationWarning
         className={`${inter.className} ${caveat.variable} min-h-screen bg-background text-foreground`}
       >
-        <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8">
+        <main className="flex min-h-screen flex-col items-center justify-between">
           {children}
         </main>
       </body>

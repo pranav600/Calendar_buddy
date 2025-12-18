@@ -12,9 +12,18 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(true);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [events, setEvents] = useState<Record<string, DayWorkspaceData>>({});
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Check if user has seen the Coming Soon modal
+  useEffect(() => {
+    const hasSeen = localStorage.getItem('hasSeenComingSoonModal');
+    if (!hasSeen) {
+      setShowWelcomeModal(true);
+      localStorage.setItem('hasSeenComingSoonModal', 'true');
+    }
+  }, []);
 
   // Initialize theme based on system or local storage (optional)
   useEffect(() => {
@@ -98,7 +107,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full p-2 md:p-4 font-mono text-foreground transition-colors duration-300 flex flex-col items-center relative overflow-hidden">
+    <div className="w-full font-mono text-foreground transition-colors duration-300 flex flex-col items-center relative overflow-hidden">
       
       {/* Coming Soon Modal */}
       <ComingSoonModal 
@@ -109,16 +118,19 @@ export default function Home() {
       {/* Top Header */}
       <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      {/* Calendar Component */}
-      <Calendar 
-        currentDate={currentDate} 
-        setCurrentDate={setCurrentDate} 
-        events={events} 
-        onDateClick={handleDateClick} 
-      />
+      {/* Main Content Area */}
+      <div className="w-full p-2 md:p-2 flex flex-col items-center">
+          {/* Calendar Component */}
+          <Calendar 
+            currentDate={currentDate} 
+            setCurrentDate={setCurrentDate} 
+            events={events} 
+            onDateClick={handleDateClick} 
+          />
 
-      {/* Footer Year */}
-      <Footer currentDate={currentDate} />
+          {/* Footer Year */}
+          <Footer currentDate={currentDate} />
+      </div>
 
 
       {/* Full Screen Whiteboard Workspace */}

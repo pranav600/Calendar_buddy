@@ -37,7 +37,17 @@ export function WhiteboardWorkspace({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setData(initialData);
+    // Sanitize incoming data to ensure all stickies have unique IDs
+    // This handles cases where backend might return empty IDs causing duplicate key errors
+    const sanitizedStickies = (initialData.stickies || []).map(s => ({
+        ...s,
+        id: s.id || `sticky-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    }));
+
+    setData({
+        ...initialData,
+        stickies: sanitizedStickies
+    });
   }, [initialData]);
 
   const handleAddSticky = () => {
@@ -53,7 +63,8 @@ export function WhiteboardWorkspace({
     }
 
     const newSticky: StickyNoteItem = {
-      id: Date.now().toString(),
+      // Use a more robust ID generation combining timestamp and random string
+      id: `sticky-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       x: initialX,
       y: initialY,
       content: '',

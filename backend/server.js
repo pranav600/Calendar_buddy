@@ -18,23 +18,23 @@ mongoose
 const app = express();
 
 app.use(
-	session({
-		secret: process.env.COOKIE_KEY || "secret",
-		resave: false,
-		saveUninitialized: false,
-		cookie: { maxAge: 24 * 60 * 60 * 1000 }
-	})
+  session({
+    secret: process.env.COOKIE_KEY || "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 },
+  })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(
-	cors({
-		origin: "http://localhost:3000",
-		methods: "GET,POST,PUT,DELETE",
-		credentials: true,
-	})
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
 );
 
 app.use(express.json());
@@ -42,11 +42,12 @@ app.use(express.json());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/events", require("./routes/events"));
+app.use("/user", require("./routes/user"));
 
 const PORT = 5001; // Hardcoded to avoid conflict
 console.log("PORT from env:", process.env.PORT);
 console.log("Using PORT:", PORT);
 
 app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

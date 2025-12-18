@@ -66,7 +66,7 @@ export function DraggableStickyNote({
       style={{ 
         boxShadow: "5px 5px 15px rgba(0,0,0,0.2)"
       }}
-    >
+    > 
       {/* Delete Button (visible on hover) */}
       {/* Color Picker (visible on hover) - Positioned vertically on the left */}
       <div 

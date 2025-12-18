@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ThemeToggleProps {
   isDarkMode: boolean;
@@ -8,10 +8,10 @@ interface ThemeToggleProps {
 export function ThemeToggle({ isDarkMode, toggleTheme }: ThemeToggleProps) {
   return (
     <label className="inline-flex items-center cursor-pointer">
-      <input 
-        type="checkbox" 
-        value="" 
-        className="sr-only peer" 
+      <input
+        type="checkbox"
+        value=""
+        className="sr-only peer"
         checked={isDarkMode}
         onChange={toggleTheme}
       />

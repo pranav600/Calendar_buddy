@@ -23,6 +23,11 @@ const UserSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    calendarColors: {
+      type: Map,
+      of: String,
+      default: {},
+    },
   },
   {
     timestamps: true,
