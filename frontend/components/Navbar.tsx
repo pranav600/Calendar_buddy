@@ -4,7 +4,8 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
-import { ThemeToggle } from "./ThemeToggle";
+// import { ThemeToggle } from "./ThemeToggle";
+import { DarkModeSwitch } from "react-toggle-dark-mode";
 import { LoginModal } from "./LoginModal";
 
 interface NavbarProps {
@@ -172,7 +173,13 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
             </button>
           )}
 
-          <ThemeToggle isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+          <DarkModeSwitch
+            checked={isDarkMode}
+            onChange={toggleTheme}
+            size={30}
+            moonColor="#f3f4f6"
+            sunColor="#f59e0b"
+          />
         </div>
 
         <LoginModal
