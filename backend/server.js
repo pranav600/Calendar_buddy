@@ -31,7 +31,7 @@ app.use(passport.session());
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -44,10 +44,11 @@ app.use("/auth", authRoutes);
 app.use("/events", require("./routes/events"));
 app.use("/user", require("./routes/user"));
 
-const PORT = 5001; // Hardcoded to avoid conflict
-console.log("PORT from env:", process.env.PORT);
-console.log("Using PORT:", PORT);
+// Health check
+app.get("/", (req, res) => res.send("🟢 Calendar Buddy API is running"));
+
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
