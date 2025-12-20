@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Navbar } from "../components/Navbar";
-import { WhiteboardWorkspace, DayWorkspaceData } from "../components/WhiteboardWorkspace";
+import {
+  WhiteboardWorkspace,
+  DayWorkspaceData,
+} from "../components/WhiteboardWorkspace";
 import { ComingSoonModal } from "../components/ComingSoonModal";
 import { Footer } from "../components/Footer";
 import { Calendar } from "../components/Calendar";
@@ -18,16 +21,20 @@ export default function Home() {
 
   // Check if user has seen the Coming Soon modal
   useEffect(() => {
-    const hasSeen = localStorage.getItem('hasSeenComingSoonModal');
+    const hasSeen = localStorage.getItem("hasSeenComingSoonModal");
     if (!hasSeen) {
       setShowWelcomeModal(true);
-      localStorage.setItem('hasSeenComingSoonModal', 'true');
+      localStorage.setItem("hasSeenComingSoonModal", "true");
     }
   }, []);
 
   // Initialize theme based on system or local storage (optional)
   useEffect(() => {
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
       setIsDarkMode(true);
     } else {
       setIsDarkMode(false);
@@ -38,9 +45,12 @@ export default function Home() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch("http://localhost:5001/events", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          "https://calendar-buddy-bkend.onrender.com/events",
+          {
+            credentials: "include",
+          }
+        );
         if (res.ok) {
           const data = await res.json();
           const eventsMap: Record<string, DayWorkspaceData> = {};
@@ -62,11 +72,11 @@ export default function Home() {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     if (!isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.theme = 'dark';
+      document.documentElement.classList.add("dark");
+      localStorage.theme = "dark";
     } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.theme = 'light';
+      document.documentElement.classList.remove("dark");
+      localStorage.theme = "light";
     }
   };
 
@@ -78,7 +88,7 @@ export default function Home() {
   const handleSaveEvent = async (data: DayWorkspaceData) => {
     if (!selectedDate) return;
     const dateKey = format(selectedDate, "yyyy-MM-dd");
-    
+
     // Update local state immediately
     setEvents((prev) => ({
       ...prev,
@@ -87,7 +97,7 @@ export default function Home() {
 
     // Save to backend
     try {
-      await fetch("http://localhost:5001/events/save", {
+      await fetch("https://calendar-buddy-bkend.onrender.com/events/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,11 +118,10 @@ export default function Home() {
 
   return (
     <div className="w-full font-mono text-foreground transition-colors duration-300 flex flex-col items-center relative overflow-hidden">
-      
       {/* Coming Soon Modal */}
-      <ComingSoonModal 
-        isOpen={showWelcomeModal} 
-        onClose={() => setShowWelcomeModal(false)} 
+      <ComingSoonModal
+        isOpen={showWelcomeModal}
+        onClose={() => setShowWelcomeModal(false)}
       />
 
       {/* Top Header */}
@@ -120,26 +129,28 @@ export default function Home() {
 
       {/* Main Content Area */}
       <div className="w-full p-2 md:p-2 flex flex-col items-center">
-          {/* Calendar Component */}
-          <Calendar 
-            currentDate={currentDate} 
-            setCurrentDate={setCurrentDate} 
-            events={events} 
-            onDateClick={handleDateClick} 
-          />
+        {/* Calendar Component */}
+        <Calendar
+          currentDate={currentDate}
+          setCurrentDate={setCurrentDate}
+          events={events}
+          onDateClick={handleDateClick}
+        />
 
-          {/* Footer Year */}
-          <Footer currentDate={currentDate} />
+        {/* Footer Year */}
+        <Footer currentDate={currentDate} />
       </div>
-
 
       {/* Full Screen Whiteboard Workspace */}
       <WhiteboardWorkspace
         isOpen={showEventModal}
         selectedDate={selectedDate}
         initialData={
-            selectedDate 
-            ? (events[format(selectedDate, "yyyy-MM-dd")] || { note: "", stickies: [] })
+          selectedDate
+            ? events[format(selectedDate, "yyyy-MM-dd")] || {
+                note: "",
+                stickies: [],
+              }
             : { note: "", stickies: [] }
         }
         onClose={() => setShowEventModal(false)}
@@ -148,4 +159,3 @@ export default function Home() {
     </div>
   );
 }
-

@@ -34,7 +34,7 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
         // we might not get persistence on refresh unless cookies are set correctly.
         // For this step, I'll assume we want to TRY fetching.
         const response = await fetch(
-          "http://localhost:5001/auth/login/success",
+          "https://calendar-buddy-bkend.onrender.com/auth/login/success",
           {
             method: "GET",
             credentials: "include", // Important: Send session cookie
@@ -68,7 +68,10 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
 
     keysToRemove.forEach((key) => localStorage.removeItem(key));
 
-    window.open("http://localhost:5001/auth/logout", "_self");
+    window.open(
+      "https://calendar-buddy-bkend.onrender.com/auth/logout",
+      "_self"
+    );
   };
 
   return (
@@ -78,7 +81,7 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
       <div className="flex justify-between items-center px-6 md:px-12 py-4">
         {/* Project Name */}
         <h1 className="text-2xl font-black tracking-tight drop-shadow-sm font-mono bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text">
-          Calendar Buddy
+          Calendrix
         </h1>
 
         {/* Right Side Actions */}
@@ -97,6 +100,7 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
                     }
                     alt={user.displayName}
                     className="w-9 h-9 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
+                    referrerPolicy="no-referrer" //Google often blocks profile images if the request comes from a different domain
                   />
                 ) : (
                   <UserCircleIcon className="w-9 h-9 text-blue-600 dark:text-blue-400" />
@@ -120,7 +124,7 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-[-6rem] top-16 mt-2 w-60 p-5 z-[110] bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 dark:border-zinc-700/50">
+                      className="absolute right-[-5rem] top-16 mt-2 w-60 p-5 z-[110] bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 dark:border-zinc-700/50">
                       <div className="flex flex-col items-center gap-3 mb-4">
                         {user.image ||
                         user.avatarUrl ||
@@ -133,6 +137,7 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
                             }
                             alt={user.displayName}
                             className="w-16 h-16 rounded-full border-2 border-white dark:border-zinc-700 shadow-md object-cover"
+                            referrerPolicy="no-referrer"
                           />
                         ) : (
                           <UserCircleIcon className="w-16 h-16 text-blue-600 dark:text-blue-400" />

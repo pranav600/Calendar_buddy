@@ -88,9 +88,12 @@ export function Calendar({
     // 2. Sync with Backend
     const fetchColors = async () => {
       try {
-        const res = await fetch("http://localhost:5001/user/colors", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          "https://calendar-buddy-bkend.onrender.com/user/colors",
+          {
+            credentials: "include",
+          }
+        );
         if (res.ok) {
           const colorMap = await res.json();
           const backendColor = colorMap[monthKey];
@@ -117,7 +120,7 @@ export function Calendar({
 
     // Update Backend
     try {
-      await fetch("http://localhost:5001/user/colors", {
+      await fetch("https://calendar-buddy-bkend.onrender.com/user/colors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
