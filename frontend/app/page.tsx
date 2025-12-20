@@ -125,7 +125,11 @@ export default function Home() {
       />
 
       {/* Top Header */}
-      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Navbar
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
+        mounted={true}
+      />
 
       {/* Main Content Area */}
       <div className="w-full p-2 md:p-2 flex flex-col items-center">

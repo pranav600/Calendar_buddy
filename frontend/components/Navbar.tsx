@@ -11,6 +11,7 @@ import { LoginModal } from "./LoginModal";
 interface NavbarProps {
   isDarkMode: boolean;
   toggleTheme: () => void;
+  mounted?: boolean;
 }
 
 interface User {
@@ -20,7 +21,11 @@ interface User {
   image?: string; // From MongoDB User model
 }
 
-export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
+export function Navbar({
+  isDarkMode,
+  toggleTheme,
+  mounted = false,
+}: NavbarProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -178,13 +183,15 @@ export function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
             </button>
           )}
 
-          <DarkModeSwitch
-            checked={isDarkMode}
-            onChange={toggleTheme}
-            size={30}
-            moonColor="#f3f4f6"
-            sunColor="#f59e0b"
-          />
+          {mounted && (
+            <DarkModeSwitch
+              checked={isDarkMode}
+              onChange={toggleTheme}
+              size={30}
+              moonColor="#f3f4f6"
+              sunColor="#f59e0b"
+            />
+          )}
         </div>
 
         <LoginModal
