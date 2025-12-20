@@ -17,12 +17,18 @@ mongoose
   .catch((err) => console.log("MongoDB Connection Error:", err));
 const app = express();
 
+app.set("trust proxy", 1); // Trust first proxy (required for Render/Heroku)
+
 app.use(
   session({
     secret: process.env.COOKIE_KEY || "secret",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: true, // Required for SameSite="None"
+      sameSite: "none", // Required for cross-origin (Frontend on localhost, Backend on Render)
+    },
   })
 );
 
