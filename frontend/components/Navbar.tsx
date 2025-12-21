@@ -86,7 +86,7 @@ export function Navbar({
       <div className="flex justify-between items-center px-6 md:px-12 py-4">
         {/* Project Name */}
         <h1 className="text-2xl font-black tracking-tight drop-shadow-sm font-mono bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text">
-          Calendrix
+          Calendar Buddy
         </h1>
 
         {/* Right Side Actions */}
