@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat" });
 
 export const metadata: Metadata = {
-  title: "Calendrix",
+  title: "Calendar Buddy",
   description: "A simple calendar + notes application",
 };
 
