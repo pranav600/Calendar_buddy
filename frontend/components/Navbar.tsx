@@ -113,11 +113,11 @@ export function Navbar({
                       user.image || user.avatarUrl || user.photos?.[0]?.value
                     }
                     alt={user.displayName}
-                    className="w-6 h-6 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
+                    className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
                     referrerPolicy="no-referrer" //Google often blocks profile images if the request comes from a different domain
                   />
                 ) : (
-                  <UserCircleIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <UserCircleIcon className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                 )}
                 {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[100px] truncate">
                   {user.displayName}
@@ -154,7 +154,7 @@ export function Navbar({
                             referrerPolicy="no-referrer"
                           />
                         ) : (
-                          <UserCircleIcon className="w-16 h-10 text-blue-600 dark:text-blue-400" />
+                          <UserCircleIcon className="w-16 h-16 text-blue-600 dark:text-blue-400" />
                         )}
                         <div className="text-center">
                           <p className="font-semibold text-gray-900 dark:text-white text-lg">
