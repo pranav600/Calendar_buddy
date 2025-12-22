@@ -22,6 +22,7 @@ interface CalendarProps {
   setCurrentDate: (date: Date) => void;
   events: Record<string, DayWorkspaceData>;
   onDateClick: (day: Date) => void;
+  today: Date;
 }
 
 const variants: Variants = {
@@ -68,6 +69,7 @@ export function Calendar({
   setCurrentDate,
   events,
   onDateClick,
+  today,
 }: CalendarProps) {
   const [direction, setDirection] = useState(0);
   const [calendarColor, setCalendarColor] = useState(colors[0].class);
@@ -258,10 +260,9 @@ export function Calendar({
               ))}
               {daysInMonth.map((day) => {
                 const isToday =
-                  format(day, "yyyy-MM-dd") ===
-                  format(new Date(), "yyyy-MM-dd");
+                  format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd");
                 const hasNote = hasEvent(day);
-                const isFuture = isAfter(day, startOfDay(new Date()));
+                const isFuture = isAfter(day, startOfDay(today));
 
                 return (
                   <motion.button

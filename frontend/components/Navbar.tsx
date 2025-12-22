@@ -154,7 +154,7 @@ export function Navbar({
                             referrerPolicy="no-referrer"
                           />
                         ) : (
-                          <UserCircleIcon className="w-16 h-16 text-blue-600 dark:text-blue-400" />
+                          <UserCircleIcon className="w-16 h-10 text-blue-600 dark:text-blue-400" />
                         )}
                         <div className="text-center">
                           <p className="font-semibold text-gray-900 dark:text-white text-lg">

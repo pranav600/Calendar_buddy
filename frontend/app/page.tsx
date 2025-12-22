@@ -13,6 +13,12 @@ import { Calendar } from "../components/Calendar";
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [today, setToday] = useState<Date | null>(null);
+
+  // Set 'today' only on client side to avoid hydration mismatch
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -139,6 +145,7 @@ export default function Home() {
           setCurrentDate={setCurrentDate}
           events={events}
           onDateClick={handleDateClick}
+          today={today || new Date()} // Fallback for initial render, effectively client-side
         />
 
         {/* Footer Year */}
