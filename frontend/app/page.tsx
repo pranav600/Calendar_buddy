@@ -16,8 +16,47 @@ export default function Home() {
   const [today, setToday] = useState<Date | null>(null);
 
   // Set 'today' only on client side to avoid hydration mismatch
+  // Set 'today' and keep it updated
   useEffect(() => {
+    // Initial set
     setToday(new Date());
+
+    // Function to update date if it has changed
+    const updateDate = () => {
+      const now = new Date();
+      setToday((prev) => {
+        if (!prev) return now;
+        // Only update if the day has changed to avoid unnecessary re-renders
+        if (
+          now.getDate() !== prev.getDate() ||
+          now.getMonth() !== prev.getMonth() ||
+          now.getFullYear() !== prev.getFullYear()
+        ) {
+          return now;
+        }
+        return prev;
+      });
+    };
+
+    // Check on visibility change (tab switch/window minimize)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        updateDate();
+      }
+    };
+
+    // Check on window focus (clicking back into the window)
+    const handleFocus = () => {
+      updateDate();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
