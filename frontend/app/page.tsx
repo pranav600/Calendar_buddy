@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { Navbar } from "../components/Navbar";
 import {
   WhiteboardWorkspace,
@@ -15,33 +15,50 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [today, setToday] = useState<Date | null>(null);
 
-  // Set 'today' only on client side to avoid hydration mismatch
   // Set 'today' and keep it updated
   useEffect(() => {
     // Initial set
-    setToday(new Date());
+    setToday(startOfDay(new Date()));
 
     // Function to update date if it has changed
     const updateDate = () => {
-      const now = new Date();
+      const now = startOfDay(new Date());
       setToday((prev) => {
         if (!prev) return now;
         // Only update if the day has changed to avoid unnecessary re-renders
-        if (
-          now.getDate() !== prev.getDate() ||
-          now.getMonth() !== prev.getMonth() ||
-          now.getFullYear() !== prev.getFullYear()
-        ) {
+        if (now.getTime() !== prev.getTime()) {
           return now;
         }
         return prev;
       });
     };
 
+    // Calculate time until next midnight and set timer
+    const scheduleNextUpdate = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+
+      const msUntilMidnight = tomorrow.getTime() - now.getTime();
+
+      return setTimeout(() => {
+        updateDate();
+        // Reschedule for the next midnight after update
+        timerId = scheduleNextUpdate();
+      }, msUntilMidnight);
+    };
+
+    let timerId = scheduleNextUpdate();
+
     // Check on visibility change (tab switch/window minimize)
+    // This acts as a backup if the timer doesn't fire due to sleep
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         updateDate();
+        // Reset timer on wake/visibility to ensure accuracy
+        clearTimeout(timerId);
+        timerId = scheduleNextUpdate();
       }
     };
 
@@ -50,14 +67,11 @@ export default function Home() {
       updateDate();
     };
 
-    // Periodic check (every minute) to handle midnight transition while open
-    const intervalId = setInterval(updateDate, 60 * 1000);
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("focus", handleFocus);
 
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(timerId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", handleFocus);
     };
