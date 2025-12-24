@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { startOfDay, format } from "date-fns";
 import { Navbar } from "../components/Navbar";
 import {
   WhiteboardWorkspace,
@@ -13,6 +13,27 @@ import { Calendar } from "../components/Calendar";
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [today, setToday] = useState(() => startOfDay(new Date()));
+
+  useEffect(() => {
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      0,
+      0,
+      1
+    );
+
+    const timeout = setTimeout(() => {
+      const newToday = startOfDay(new Date());
+      setToday(newToday);
+      setCurrentDate(newToday); // 🔥 keeps calendar in sync
+    }, nextMidnight.getTime() - now.getTime());
+
+    return () => clearTimeout(timeout);
+  }, [today]);
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -140,6 +161,7 @@ export default function Home() {
           setCurrentDate={setCurrentDate}
           events={events}
           onDateClick={handleDateClick}
+          today={today}
         />
 
         {/* Footer Year */}
