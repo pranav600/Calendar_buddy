@@ -22,7 +22,6 @@ interface CalendarProps {
   setCurrentDate: (date: Date) => void;
   events: Record<string, DayWorkspaceData>;
   onDateClick: (day: Date) => void;
-  today: Date;
 }
 
 const variants: Variants = {
@@ -69,11 +68,32 @@ export function Calendar({
   setCurrentDate,
   events,
   onDateClick,
-  today,
 }: CalendarProps) {
   const [direction, setDirection] = useState(0);
   const [calendarColor, setCalendarColor] = useState(colors[0].class);
   const [showColorPicker, setShowColorPicker] = useState(false);
+
+  // Step 2: Create a reactive today state inside the calendar
+  const [today, setToday] = useState(() => startOfDay(new Date()));
+
+  // Step 3: Auto-update today after midnight
+  useEffect(() => {
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      0,
+      0,
+      1
+    );
+
+    const timeout = setTimeout(() => {
+      setToday(startOfDay(new Date()));
+    }, nextMidnight.getTime() - now.getTime());
+
+    return () => clearTimeout(timeout);
+  }, [today]);
 
   // Load saved color preference for the CURRENT MONTH
   useEffect(() => {

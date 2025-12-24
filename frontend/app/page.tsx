@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, startOfDay } from "date-fns";
+import { format } from "date-fns";
 import { Navbar } from "../components/Navbar";
 import {
   WhiteboardWorkspace,
@@ -13,69 +13,7 @@ import { Calendar } from "../components/Calendar";
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [today, setToday] = useState<Date | null>(null);
 
-  // Set 'today' and keep it updated
-  useEffect(() => {
-    // Initial set
-    setToday(startOfDay(new Date()));
-
-    // Function to update date if it has changed
-    const updateDate = () => {
-      const now = startOfDay(new Date());
-      setToday((prev) => {
-        if (!prev) return now;
-        // Only update if the day has changed to avoid unnecessary re-renders
-        if (now.getTime() !== prev.getTime()) {
-          return now;
-        }
-        return prev;
-      });
-    };
-
-    // Calculate time until next midnight and set timer
-    const scheduleNextUpdate = () => {
-      const now = new Date();
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(0, 0, 0, 0);
-
-      const msUntilMidnight = tomorrow.getTime() - now.getTime();
-
-      return setTimeout(() => {
-        updateDate();
-        // Reschedule for the next midnight after update
-        timerId = scheduleNextUpdate();
-      }, msUntilMidnight);
-    };
-
-    let timerId = scheduleNextUpdate();
-
-    // Check on visibility change (tab switch/window minimize)
-    // This acts as a backup if the timer doesn't fire due to sleep
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        updateDate();
-        // Reset timer on wake/visibility to ensure accuracy
-        clearTimeout(timerId);
-        timerId = scheduleNextUpdate();
-      }
-    };
-
-    // Check on window focus (clicking back into the window)
-    const handleFocus = () => {
-      updateDate();
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleFocus);
-
-    return () => {
-      clearTimeout(timerId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, []);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -202,7 +140,6 @@ export default function Home() {
           setCurrentDate={setCurrentDate}
           events={events}
           onDateClick={handleDateClick}
-          today={today || new Date()} // Fallback for initial render, effectively client-side
         />
 
         {/* Footer Year */}
