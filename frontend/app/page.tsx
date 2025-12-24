@@ -50,10 +50,14 @@ export default function Home() {
       updateDate();
     };
 
+    // Periodic check (every minute) to handle midnight transition while open
+    const intervalId = setInterval(updateDate, 60 * 1000);
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("focus", handleFocus);
 
     return () => {
+      clearInterval(intervalId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", handleFocus);
     };
