@@ -15,17 +15,31 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [now, setNow] = useState<Date>(new Date());
 
-  // Live clock to keep date fresh all day
+  // 🔄 Live clock
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(new Date());
-    }, 60 * 1000); // update every minute
+    }, 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Always derive today from current time
+  // Always derive today
   const today = startOfDay(now);
+
+  // ✅ FIX: Auto-update calendar when day changes
+  useEffect(() => {
+    const currentKey = format(currentDate, "yyyy-MM-dd");
+    const todayKey = format(today, "yyyy-MM-dd");
+
+    if (
+      currentDate.getMonth() === today.getMonth() &&
+      currentDate.getFullYear() === today.getFullYear() &&
+      currentKey !== todayKey
+    ) {
+      setCurrentDate(today);
+    }
+  }, [today]);
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -33,7 +47,7 @@ export default function Home() {
   const [events, setEvents] = useState<Record<string, DayWorkspaceData>>({});
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Coming Soon modal (first visit)
+  // Coming Soon modal
   useEffect(() => {
     const hasSeen = localStorage.getItem("hasSeenComingSoonModal");
     if (!hasSeen) {
