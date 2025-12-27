@@ -13,27 +13,19 @@ import { Calendar } from "../components/Calendar";
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [today, setToday] = useState(() => startOfDay(new Date()));
+  const [now, setNow] = useState<Date>(new Date());
 
+  // Live clock to keep date fresh all day
   useEffect(() => {
-    const now = new Date();
-    const nextMidnight = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + 1,
-      0,
-      0,
-      1
-    );
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 60 * 1000); // update every minute
 
-    const timeout = setTimeout(() => {
-      const newToday = startOfDay(new Date());
-      setToday(newToday);
-      setCurrentDate(newToday); // 🔥 keeps calendar in sync
-    }, nextMidnight.getTime() - now.getTime());
+    return () => clearInterval(interval);
+  }, []);
 
-    return () => clearTimeout(timeout);
-  }, [today]);
+  // Always derive today from current time
+  const today = startOfDay(now);
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -41,7 +33,7 @@ export default function Home() {
   const [events, setEvents] = useState<Record<string, DayWorkspaceData>>({});
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Check if user has seen the Coming Soon modal
+  // Coming Soon modal (first visit)
   useEffect(() => {
     const hasSeen = localStorage.getItem("hasSeenComingSoonModal");
     if (!hasSeen) {
@@ -50,7 +42,7 @@ export default function Home() {
     }
   }, []);
 
-  // Initialize theme based on system or local storage (optional)
+  // Theme init
   useEffect(() => {
     if (
       localStorage.theme === "dark" ||
@@ -58,48 +50,42 @@ export default function Home() {
         window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       setIsDarkMode(true);
-    } else {
-      setIsDarkMode(false);
+      document.documentElement.classList.add("dark");
     }
   }, []);
 
-  // Fetch events from backend
+  // Fetch events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const res = await fetch(
           "https://calendar-buddy-bkend.onrender.com/events",
-          {
-            credentials: "include",
-          }
+          { credentials: "include" }
         );
+
         if (res.ok) {
           const data = await res.json();
-          const eventsMap: Record<string, DayWorkspaceData> = {};
+          const map: Record<string, DayWorkspaceData> = {};
           data.forEach((evt: any) => {
-            eventsMap[evt.date] = {
+            map[evt.date] = {
               note: evt.note,
               stickies: evt.stickies,
             };
           });
-          setEvents(eventsMap);
+          setEvents(map);
         }
-      } catch (error) {
-        console.error("Failed to fetch events", error);
+      } catch (err) {
+        console.error("Failed to fetch events", err);
       }
     };
+
     fetchEvents();
   }, []);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    if (!isDarkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
-    }
+    setIsDarkMode((prev) => !prev);
+    document.documentElement.classList.toggle("dark");
+    localStorage.theme = !isDarkMode ? "dark" : "light";
   };
 
   const handleDateClick = (day: Date) => {
@@ -109,21 +95,18 @@ export default function Home() {
 
   const handleSaveEvent = async (data: DayWorkspaceData) => {
     if (!selectedDate) return;
+
     const dateKey = format(selectedDate, "yyyy-MM-dd");
 
-    // Update local state immediately
     setEvents((prev) => ({
       ...prev,
       [dateKey]: data,
     }));
 
-    // Save to backend
     try {
       await fetch("https://calendar-buddy-bkend.onrender.com/events/save", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           date: dateKey,
@@ -131,31 +114,27 @@ export default function Home() {
           stickies: data.stickies,
         }),
       });
-    } catch (error) {
-      console.error("Failed to save event", error);
+    } catch (err) {
+      console.error("Failed to save event", err);
     }
 
     setShowEventModal(false);
   };
 
   return (
-    <div className="w-full font-mono text-foreground transition-colors duration-300 flex flex-col items-center relative overflow-hidden">
-      {/* Coming Soon Modal */}
+    <div className="w-full font-mono flex flex-col items-center overflow-hidden">
       <ComingSoonModal
         isOpen={showWelcomeModal}
         onClose={() => setShowWelcomeModal(false)}
       />
 
-      {/* Top Header */}
       <Navbar
         isDarkMode={isDarkMode}
         toggleTheme={toggleTheme}
         mounted={true}
       />
 
-      {/* Main Content Area */}
-      <div className="w-full p-2 md:p-2 flex flex-col items-center">
-        {/* Calendar Component */}
+      <div className="w-full p-2 flex flex-col items-center">
         <Calendar
           currentDate={currentDate}
           setCurrentDate={setCurrentDate}
@@ -164,11 +143,9 @@ export default function Home() {
           today={today}
         />
 
-        {/* Footer Year */}
         <Footer currentDate={currentDate} />
       </div>
 
-      {/* Full Screen Whiteboard Workspace */}
       <WhiteboardWorkspace
         isOpen={showEventModal}
         selectedDate={selectedDate}
