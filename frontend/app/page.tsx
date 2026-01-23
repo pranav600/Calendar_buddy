@@ -1,3 +1,7 @@
+/**
+ * Calendar Buddy - Main Home Page
+ * Interactive calendar with whiteboard workspace for daily planning
+ */
 "use client";
 export const dynamic = "force-dynamic";
 
@@ -93,7 +97,7 @@ export default function Home() {
       try {
         const res = await fetch(
           "https://calendar-buddy-bkend.onrender.com/events",
-          { credentials: "include" }
+          { credentials: "include" },
         );
 
         if (res.ok) {
