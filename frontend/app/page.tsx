@@ -18,6 +18,7 @@ import { Calendar } from "../components/Calendar";
 
 export default function Home() {
   // 🧱 Mount guard (prevents Vercel hydration + date cache issues)
+  // Ensures client-side only rendering for date-dependent components
   const [mounted, setMounted] = useState(false);
 
   // 📅 Dates (client-only)
@@ -34,7 +35,6 @@ export default function Home() {
   // ✅ Mark component mounted (client confirmed)
   useEffect(() => {
     setMounted(true);
-    console.log("Component Mounted"); // specific comment for git commit
   }, []);
 
   // ⏱️ Live clock (keeps date fresh)
