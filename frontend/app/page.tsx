@@ -18,7 +18,7 @@ import { Calendar } from "../components/Calendar";
 
 export default function Home() {
   // 🧱 Mount guard (prevents Vercel hydration + date cache issues)
-  // Ensures client-side only rendering for date-dependent components
+  // Ensures client-side only rendering for date-dependent components.
   const [mounted, setMounted] = useState(false);
 
   // 📅 Dates (client-only)
