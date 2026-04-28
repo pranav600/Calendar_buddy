@@ -20,7 +20,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleGoogleLogin = () => {
     window.open(
       "https://calendar-buddy-bkend.onrender.com/auth/google",
-      "_self"
+      "_self",
     );
   };
 

@@ -47,7 +47,7 @@ export function Navbar({
               Accept: "application/json",
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         if (response.status === 200) {
@@ -75,7 +75,7 @@ export function Navbar({
 
     window.open(
       "https://calendar-buddy-bkend.onrender.com/auth/logout",
-      "_self"
+      "_self",
     );
   };
 
