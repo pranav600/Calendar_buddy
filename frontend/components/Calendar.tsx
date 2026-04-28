@@ -87,7 +87,6 @@ export function Calendar({
       setCalendarColor(colors[0].class);
     }
 
-    // 2. Sync with Backend
     const fetchColors = async () => {
       try {
         const res = await fetch(
@@ -148,6 +147,12 @@ export function Calendar({
   const handleNextMonth = () => {
     setDirection(1);
     setCurrentDate(addMonths(currentDate, 1));
+  };
+
+  const handleToday = () => {
+    if (format(currentDate, "yyyy-MM") === format(today, "yyyy-MM")) return;
+    setDirection(isAfter(today, currentDate) ? 1 : -1);
+    setCurrentDate(today);
   };
 
   const hasEvent = (date: Date): boolean => {
@@ -228,7 +233,14 @@ export function Calendar({
               <h2 className="text-3xl font-black text-gray-800 dark:text-gray-800 tracking-tight">
                 {format(currentDate, "MMMM yyyy")}
               </h2>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                {format(currentDate, "yyyy-MM") !== format(today, "yyyy-MM") && (
+                  <button
+                    onClick={handleToday}
+                    className="px-4 py-1.5 text-sm font-semibold rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors mr-2">
+                    Today
+                  </button>
+                )}
                 <button
                   onClick={handlePrevMonth}
                   className="p-2 hover:bg-black/5 rounded-full transition-colors text-gray-600 dark:text-gray-600">
