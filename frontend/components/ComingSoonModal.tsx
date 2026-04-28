@@ -56,7 +56,7 @@ export function ComingSoonModal({ isOpen, onClose }: ComingSoonModalProps) {
             >
                 <StarIcon className="w-6 h-6 text-yellow-400" />
                 <span className="text-3xl font-bold text-gray-800 dark:text-white tracking-tighter">
-                    2026
+                    Welcome!
                 </span>
                 <StarIcon className="w-6 h-6 text-yellow-400" />
             </motion.div>
@@ -69,7 +69,7 @@ export function ComingSoonModal({ isOpen, onClose }: ComingSoonModalProps) {
               className="text-lg text-gray-600 dark:text-gray-300 mb-8 font-medium leading-relaxed"
             >
               Get ready for a whole new way to organize your life. <br />
-              <span className="text-blue-600 dark:text-blue-400 font-bold">Coming Soon.</span>
+              <span className="text-blue-600 dark:text-blue-400 font-bold">Let's make every day count.</span>
             </motion.p>
 
             {/* Button */}
@@ -79,7 +79,7 @@ export function ComingSoonModal({ isOpen, onClose }: ComingSoonModalProps) {
               onClick={onClose}
               className="px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all"
             >
-              I Can't Wait! 🚀
+              Get Started 🚀
             </motion.button>
           </motion.div>
         </motion.div>
